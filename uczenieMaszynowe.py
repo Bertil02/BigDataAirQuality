@@ -51,32 +51,43 @@ def makeGraphs(self, id):
 
 def splitAirQualityData(self,values, keys):
     for label in range(len(keys)):
-        linearRegression(self, values[label])
+        linearRegression(self, values[label],keys[label])
 
 
-def linearRegression(self,values):
+def linearRegression(self,values,label):
     indexes = np.arange(len(values))
     ones = np.ones(len(values))
     X = np.stack((ones, values), axis=1)
     gradLin = LinearRegression()
     gradLin.fit(X, indexes)
     res = gradLin.predict(X)
+    wsp = gradLin.coef_
+    res = np.sort(res)
+
+    line = []
+    for i in range(len(values)):
+        line.append(i*(wsp[1]-wsp[0])+np.mean(values))
+
+    print(res, wsp)
     #res = np.stack((indexes,res), axis=1)
 
     #rysowanie wykresów
     plt.rcParams['font.size'] = 6
     plt.subplots_adjust(left=0.1, right=0.9, top=1, bottom=0.1)
 
-    dataSet = {"Pomiar" : indexes, "Wartość" : res}
-    dfML = pd.DataFrame(dataSet,columns=["Pomiar","Wartość"])
+    dataSet = { "Wartość" : values, "Regresja" : line}
+    dfML = pd.DataFrame(dataSet,columns=["Wartość", "Regresja"])
     print(dfML)
 
     fig = plt.figure(figsize=(8,7), dpi =100)
 
+
     ax = fig.add_subplot(111)
     chart_type = FigureCanvasTkAgg(fig, self.mlFrame)
     chart_type.get_tk_widget().pack()
-    dfML.plot(kind="scatter", x = indexes, y = res, legend=True, ax = ax )
+    #ax.set_title(label)
+    dfML.plot(kind="line", legend=True, ax = ax , title=label)
+
 
 
 

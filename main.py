@@ -54,8 +54,8 @@ class GUI:
         self.mlCanvas.configure(yscrollcommand=self.mlVsb.set)
         self.mlVsb.pack(side="right", fill="y", expand=0)
         self.mlCanvas.pack(fill="both", expand=1)
-        self.mlCanvas.create_window((940,0), window=self.mlFrame,anchor=CENTER, tags="self.mlFrame", width=1000)
-        self.mlFrame.bind("<Configure>",self.onFrameConfigure)
+        self.mlCanvas.create_window((840,0), window=self.mlFrame,anchor=CENTER, tags="self.mlFrame", width=900)
+        self.mlFrame.bind("<Configure>",self.onMlFrameConfigure)
 
         self.mlGraphTitle = Label(self.mlFrame, text="", font=(None,17))
         self.mlGraphTitle.place(relx=.3, y=180, anchor=CENTER)
@@ -96,6 +96,11 @@ class GUI:
         '''Reset the scroll region to encompass the inner frame'''
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+    def onMlFrameConfigure(self, event):
+        '''Reset the scroll region to encompass the inner frame'''
+        self.mlCanvas.configure(scrollregion=self.mlCanvas.bbox("all"))
+        self.mlCanvas.configure(scrollregion=self.mlCanvas.bbox("all"))
 
     #pobiera nazwy stacji pomiarowych
     def stacje_pomiarowe(self):
