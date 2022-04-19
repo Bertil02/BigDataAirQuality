@@ -4,6 +4,8 @@ from tkinter import ttk
 import requests
 import analiza
 import dane as pobraneDane
+import uczenieMaszynowe
+
 
 class GUI:
     def __init__(self, master):
@@ -35,8 +37,34 @@ class GUI:
         chooseTable = tkinter.OptionMenu(self.tableTab, tkvar, *tables, command=self.get_data)
         chooseTable.pack(pady=100)
 
-        # część do tabu z wykresami
+        # machineLearning
+        self.MLTitle = Label(self.machineLearningTab, text="Wybierz stację pomiarową", font=(None, 20))
+        self.MLTitle.place(relx=.5, y=50, anchor=CENTER)
+        stacje = self.stacje_pomiarowe()  # pobieranie nazw stacji pomiarowych
+        mlvar = StringVar(master)
+        mlvar.set(stacje[0][0])  # stacje pomiarowe
+        mlChooseStation = tkinter.OptionMenu(self.machineLearningTab, mlvar, *stacje[0], command=self.machine_learning)
+        mlChooseStation.pack(pady=100)
 
+        #ramka wykresów
+        self. mlCanvas = Canvas(self.machineLearningTab)
+        self. mlFrame = Frame(self.mlCanvas)
+        self.mlVsb = Scrollbar(self.machineLearningTab, orient="vertical", command=self.mlCanvas.yview)
+        self.mlCanvas.configure(yscrollcommand=self.mlVsb.set)
+        self.mlVsb.pack(side="right", fill="y", expand=0)
+        self.mlCanvas.pack(fill="both", expand=1)
+        self.mlCanvas.create_window((940,0), window=self.mlFrame,anchor=CENTER, tags="self.mlFrame", width=1000)
+        self.mlFrame.bind("<Configure>",self.onFrameConfigure)
+
+        self.mlGraphTitle = Label(self.mlFrame, text="", font=(None,17))
+        self.mlGraphTitle.place(relx=.3, y=180, anchor=CENTER)
+        self.mlIndex = Label(self.mlFrame, text="", font=(None,17))
+        self.mlIndex.place(relx=.3, y=210, anchor=CENTER)
+
+
+
+
+        # część do tabu z wykresami
         # miejsce w którym udało się zaimplementować scrollowanie
         self.canvas = Canvas(self.graphTab)
         self.frame = Frame(self.canvas)
@@ -56,7 +84,7 @@ class GUI:
         label = Label(self.frame, text="Wybierz stację pomiarową", font=(None, 20)).place(relx=.3, y=65, anchor=CENTER)
         tkvar = StringVar(master)
 
-        stacjePomiarowe = self.stacje_pomiarowe(); #pobieranie nazw stacji pomiarowych
+        stacjePomiarowe = self.stacje_pomiarowe() #pobieranie nazw stacji pomiarowych
         tkvar.set(stacjePomiarowe[0][0]) #stacje pomiarowe
         chooseTable = tkinter.OptionMenu(self.frame, tkvar, *stacjePomiarowe[0], command=self.stanowiska_pomiarowe)
         chooseTable.pack(pady=100)
@@ -84,8 +112,18 @@ class GUI:
 
         index_jakosci = pobraneDane.index_jakosci(self, id)
         text = "Index jakości powietrza: " + str(index_jakosci)
-        self.index.configure(text=text);
+        self.index.configure(text=text)
         analiza.create_graph(self, id)
+
+    def machine_learning(self, selection):
+        print(selection)
+        self.graphTitle.configure(text=selection)
+
+        for x in range(len(pobraneDane.lista_stacji_pomiarowych)):
+            if pobraneDane.lista_stacji_pomiarowych[x].nazwa_stacji == selection:
+                id = pobraneDane.lista_stacji_pomiarowych[x].id_stacji
+
+        uczenieMaszynowe.makeGraphs(self,id)
 
     # metoda na pobranie danych z odpowiedniego api i ustawienie ich do tabeli
     def get_data(self, selection):
