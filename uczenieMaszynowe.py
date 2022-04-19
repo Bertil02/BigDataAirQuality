@@ -17,6 +17,9 @@ def create_graph(self, id):
     # rysuj_wykres(self, tablica_sum, keys, 'Zestawienie ilości elementów powietrza', 'średnie', 'elementy', keys)
     # stacja_pomiarowa_na_tle_wojewodztwa(self, id);
 
+def drawGraph(self,input):
+    print(input)
+
 
 def makeGraphs(self, id):
     keys.clear()
@@ -42,41 +45,40 @@ def makeGraphs(self, id):
         tablica_values.append(value)
         tablica_keys.append(key)
 
-    splitAirQualityData(tablica_values, tablica_keys)
+    splitAirQualityData(self, tablica_values, tablica_keys)
+
 
 
 def splitAirQualityData(self,values, keys):
     for label in range(len(keys)):
-        print(keys[label])
-        print(values[label])
-        GLPredict = linearRegression(values[label])
-
-
+        linearRegression(self, values[label])
 
 
 def linearRegression(self,values):
-    indexes = np.arange(1, len(values) + 1)
-    X = np.stack((values, indexes), axis=1)
+    indexes = np.arange(len(values))
+    ones = np.ones(len(values))
+    X = np.stack((ones, values), axis=1)
     gradLin = LinearRegression()
     gradLin.fit(X, indexes)
-    res = gradLin.predict(values)
+    res = gradLin.predict(X)
+    #res = np.stack((indexes,res), axis=1)
 
     #rysowanie wykresów
     plt.rcParams['font.size'] = 6
     plt.subplots_adjust(left=0.1, right=0.9, top=1, bottom=0.1)
 
-    data = {indexes: indexes, values: values}
-    df1 = pd.DataFrame(data, columns=[indexes, values])
-    figure = plt.Figure(figsize=(8, 7), dpi=100)
-    ax = figure.add_subplot(111)
+    dataSet = {"Pomiar" : indexes, "Wartość" : res}
+    dfML = pd.DataFrame(dataSet,columns=["Pomiar","Wartość"])
+    print(dfML)
 
-    self.barGraph = FigureCanvasTkAgg(figure, self.frame)
-    self.barGraph.get_tk_widget().pack()
+    fig = plt.figure(figsize=(8,7), dpi =100)
 
-    df1 = df1[[indexes, values]]
-    df1.plot(kind=typ, legend=True, ax=ax)
+    ax = fig.add_subplot(111)
+    chart_type = FigureCanvasTkAgg(fig, self.mlFrame)
+    chart_type.get_tk_widget().pack()
+    dfML.plot(kind="scatter", x = indexes, y = res, legend=True, ax = ax )
 
-    return res
+
 
 
 

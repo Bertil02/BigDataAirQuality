@@ -15,6 +15,7 @@ class GUI:
         self.table = None
         self.tableScrollView = None
         self.barGraph = None
+        self.mlGraph = None
 
         # taby do GUI
         tabControl = ttk.Notebook(master)
@@ -41,9 +42,9 @@ class GUI:
         self.MLTitle = Label(self.machineLearningTab, text="Wybierz stację pomiarową", font=(None, 20))
         self.MLTitle.place(relx=.5, y=50, anchor=CENTER)
         stacje = self.stacje_pomiarowe()  # pobieranie nazw stacji pomiarowych
-        mlvar = StringVar(master)
-        mlvar.set(stacje[0][0])  # stacje pomiarowe
-        mlChooseStation = tkinter.OptionMenu(self.machineLearningTab, mlvar, *stacje[0], command=self.machine_learning)
+        mlVar = StringVar(master)
+        mlVar.set(stacje[0][0])  # stacje pomiarowe
+        mlChooseStation = tkinter.OptionMenu(self.machineLearningTab, mlVar, *stacje[0], command=self.machine_learning)
         mlChooseStation.pack(pady=100)
 
         #ramka wykresów
@@ -117,7 +118,7 @@ class GUI:
 
     def machine_learning(self, selection):
         print(selection)
-        self.graphTitle.configure(text=selection)
+        self.mlGraphTitle.configure(text=selection)
 
         for x in range(len(pobraneDane.lista_stacji_pomiarowych)):
             if pobraneDane.lista_stacji_pomiarowych[x].nazwa_stacji == selection:
